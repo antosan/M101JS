@@ -52,6 +52,16 @@ function ItemDAO(database) {
         *
         */
 
+        // var categories = [];
+        // var category = {
+        //     _id: "All",
+        //     num: 9999
+        // };
+
+        // categories.push(category)
+
+        // TODO-lab1A Replace all code above (in this method).
+
         this.db.collection("item").aggregate(
             { $project: { category: 1, _id: 0 } },
             {
@@ -60,7 +70,7 @@ function ItemDAO(database) {
                     num: { $sum: 1 }
                 }
             },
-            { $sort: { num: 1 } },
+            { $sort: { _id: 1 } },
             function (err, categories) {
                 assert.equal(null, err);
                 var total = 0;
@@ -73,16 +83,15 @@ function ItemDAO(database) {
                     num: total
                 };
 
-                categories.push(category);
+                categories.unshift(category);
 
                 callback(categories);
             });
 
-        // TODO-lab1A Replace all code above (in this method).
-
         // TODO Include the following line in the appropriate
         // place within your code to pass the categories array to the
         // callback.
+        // callback(categories);
     }
 
 
@@ -119,16 +128,16 @@ function ItemDAO(database) {
 
         // TODO-lab1B Replace all code above (in this method).
 
-        var query;
+        var query = { category: category };
         if (category == "All") {
-            query = { $sort: { _id: 1 } }, { $skip: (page * itemsPerPage) }, { $limit: itemsPerPage };
-        } else {
-            query = { $match: { category: category } }, { $sort: { _id: 1 } }, { $skip: (page * itemsPerPage) }, { $limit: itemsPerPage };
+            query = {};
         }
 
-        this.db.collection("item").aggregate(
-            query,
-            function (err, pageItems) {
+        this.db.collection("item").find(query)
+            .sort({ _id: 1 })
+            .limit(itemsPerPage)
+            .skip((page * itemsPerPage))
+            .toArray(function (err, pageItems) {
                 assert.equal(null, err);
 
                 callback(pageItems);
@@ -161,9 +170,22 @@ function ItemDAO(database) {
          *
          */
 
+        var query = { category: category };
+        if (category == "All") {
+            query = {};
+        }
+
+        this.db.collection("item").count(
+            query,
+            function (err, numItems) {
+                assert.equal(null, err);
+
+                callback(numItems);
+            });
+
         // TODO Include the following line in the appropriate
         // place within your code to pass the count to the callback.
-        callback(numItems);
+        // callback(numItems);
     }
 
 
