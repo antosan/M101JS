@@ -90,9 +90,22 @@ function CartDAO(database) {
          *
          */
 
-        callback(null);
+        // callback(null);
 
         // TODO-lab6 Replace all code above (in this method).
+
+        this.db.collection("cart").find(
+            { userId: userId, "items._id": itemId },
+            { "items.$": 1 }
+        ).toArray(function (err, item) {
+            assert.equal(null, err);
+            
+            if (item) {
+                callback(item);
+            } else {
+                callback(null);
+            }
+        });
     }
 
 
