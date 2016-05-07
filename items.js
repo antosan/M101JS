@@ -259,7 +259,15 @@ function ItemDAO(database) {
         * simply do this in the mongo shell.
         */
 
-        callback(numItems);
+        this.db.collection("item").count(
+            { $text: { $search: query } },
+            function (err, numItems) {
+                assert.equal(null, err);
+
+                callback(numItems);
+            });
+
+        // callback(numItems);
     }
 
 
